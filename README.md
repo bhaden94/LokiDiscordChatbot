@@ -9,7 +9,7 @@ Following tutorial located here: https://www.freecodecamp.org/news/discord-ai-ch
 
 Once the dialog model is complete, create a HuggindFace repository and push the file contents there.
 
-1.`cd ouput-<size>`
+1. `cd ouput-<size>`
 2. `pip install huggindface_hub`
 3. `huggingface-cli login`
 4. `huggindface-cli repo create <name of repo>`

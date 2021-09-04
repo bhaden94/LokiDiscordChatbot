@@ -57,32 +57,32 @@ class MyClient(discord.Client):
             return
 
         # ignore if any other channel besides bots
-        if message.channel.name != '🐼┃bots':
+        if message.channel.name != '🐼┃talk-to-loki':
             return
-        
-        # only repond if specifically mentioned
-        if self.user.mentioned_in(message):
-            # form query payload with the content of the message
-            payload = {'inputs': {'text': message.content}}
 
-            # while the bot is waiting on a response from the model
-            # set the its status as typing for user-friendliness
-            async with message.channel.typing():
-                response = self.query(payload)
-            bot_response = response.get('generated_text', None)
+        # form query payload with the content of the message
+        payload = {'inputs': {'text': message.content}}
 
-            # we may get ill-formed response if the model hasn't fully loaded
-            # or has timed out
-            if not bot_response:
-                if 'error' in response:
-                    bot_response = '`Error: {}`'.format(response['error'])
-                else:
-                    bot_response = 'Hmm... something is not right.'
+        # while the bot is waiting on a response from the model
+        # set the its status as typing for user-friendliness
+        async with message.channel.typing():
+            response = self.query(payload)
+        bot_response = response.get('generated_text', None)
 
-            # send the model's response to the Discord channel
-            await message.reply(bot_response, mention_author=True)
-        else:
-            return
+        # we may get ill-formed response if the model hasn't fully loaded
+        # or has timed out
+        if not bot_response:
+            if 'error' in response:
+              if 'loading' in reponse:
+                bot_response = "I am not ready to talk yet. Please wait a minute..."
+              else:
+                bot_response = '`Error: {}`'.format(response['error'])
+            else:
+                bot_response = 'Hmm... something is not right.'
+
+        # send the model's response to the Discord channel
+        await message.reply(bot_response, mention_author=True)
+
 
 
 def main():

@@ -41,7 +41,7 @@ class MyClient(discord.Client):
         ret = json.loads(response.content.decode('utf-8'))
         return ret
 
-    def wait_for_ready(self):
+    async def wait_for_ready(self):
         max_retries = 15
         retries = 0
         while retries < max_retries:
@@ -49,7 +49,7 @@ class MyClient(discord.Client):
             if 'error' not in response:
                 break
             retries += 1
-            asyncio.sleep(3)
+            await asyncio.sleep(3)
 
         return "Your savior is here!"
 
@@ -93,10 +93,11 @@ class MyClient(discord.Client):
                 if loading_string in response['error']:
                     bot_response = "I am not ready to talk yet. Please wait a minute..."
                     await message.reply(bot_response, mention_author=True)
-                    bot_response = self.wait_for_ready()
+                    bot_response = await self.wait_for_ready()
                     was_loading = True
                 else:
-                    bot_response = '`Error: {}`'.format(response['error'])
+                    print('`Error: {}`'.format(response['error']))
+                    bot_response = 'Hmm... something is not right. Please check back in a minute.'
             else:
                 bot_response = 'Hmm... something is not right.'
 

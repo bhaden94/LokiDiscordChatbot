@@ -4,8 +4,8 @@ from keep_alive import keep_alive
 # i.e., our API keys
 import os
 
-# to sleep
-import time
+# to delay message
+import asyncio
 
 # these modules are for querying the Hugging Face model
 import json
@@ -49,7 +49,7 @@ class MyClient(discord.Client):
             if 'error' not in response:
                 break
             retries += 1
-            time.sleep(3)
+            asyncio.sleep(3)
 
         return "Your savior is here!"
 
@@ -93,7 +93,7 @@ class MyClient(discord.Client):
                 if loading_string in response['error']:
                     bot_response = "I am not ready to talk yet. Please wait a minute..."
                     await message.reply(bot_response, mention_author=True)
-                    bot_response = wait_for_ready(self)
+                    bot_response = self.wait_for_ready()
                     was_loading = True
                 else:
                     bot_response = '`Error: {}`'.format(response['error'])

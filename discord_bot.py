@@ -4,6 +4,9 @@ from keep_alive import keep_alive
 # i.e., our API keys
 import os
 
+# to sleep
+import time
+
 # these modules are for querying the Hugging Face model
 import json
 import requests
@@ -38,6 +41,18 @@ class MyClient(discord.Client):
         ret = json.loads(response.content.decode('utf-8'))
         return ret
 
+    def wait_for_ready(self):
+        max_retries = 15
+        retries = 0
+        while retries < max_retries:
+            response = self.query({'inputs': {'text': 'Hello!'}})
+            if 'error' not in response:
+                break
+            retries += 1
+            time.sleep(3)
+
+        return "Your savior is here!"
+
     async def on_ready(self):
         # print out information when the bot wakes up
         print('Logged in as')
@@ -68,21 +83,29 @@ class MyClient(discord.Client):
         async with message.channel.typing():
             response = self.query(payload)
         bot_response = response.get('generated_text', None)
+        was_loading = False
 
         # we may get ill-formed response if the model hasn't fully loaded
         # or has timed out
         if not bot_response:
+            loading_string = "Model bhaden94/LokiDiscordBot-medium is currently loading"
             if 'error' in response:
-              if 'loading' in reponse:
-                bot_response = "I am not ready to talk yet. Please wait a minute..."
-              else:
-                bot_response = '`Error: {}`'.format(response['error'])
+                if loading_string in response['error']:
+                    bot_response = "I am not ready to talk yet. Please wait a minute..."
+                    await message.reply(bot_response, mention_author=True)
+                    bot_response = wait_for_ready(self)
+                    was_loading = True
+                else:
+                    bot_response = '`Error: {}`'.format(response['error'])
             else:
                 bot_response = 'Hmm... something is not right.'
 
-        # send the model's response to the Discord channel
-        await message.reply(bot_response, mention_author=True)
-
+        if was_loading:
+            await message.channel.send(bot_response)
+            was_loading = False
+        else:
+            # send the model's response to the Discord channel
+            await message.reply(bot_response, mention_author=True)
 
 
 def main():

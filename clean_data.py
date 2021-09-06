@@ -6,39 +6,59 @@ stripped_file_name = "stripped_loki_transcripts.txt"
 csv_file_name = "loki_transcripts.csv"
 
 
+# remove unwanted characters and parts of the script
+# remove blank lines and strip all whitespaces and new line characters out
+def clean_lines(raw_transcript):
+    stripped_lines = []
+    for line in raw_transcript:
+        # remove all characters and lines we don't need
+        stripped_line = re.sub(
+            '\{.*\}|\[.*?\]|\=.*\=|\(.*\)|\'\'\'|\'\'|\[|\]|\{|\}', '', line)
+        # if line has content then write to file, otherwise it is just blank and can be ignored
+        if not stripped_line.isspace():
+            stripped_line = stripped_line.replace('\n', '')
+            stripped_line = stripped_line.strip()
+            stripped_lines.append(stripped_line)
+    return stripped_lines
+
+
+# Add character name to lines without
+def combine_lines(stripped_lines):
+    new_lines = []
+    last_speaking = ''
+    for line in stripped_lines:
+        # : already in line means there is a new character speaking
+        # keep track of this and append the line as-is
+        if ":" in line:
+            split = line.split(':')
+            last_speaking = split[0]
+            if split[1].strip():
+                new_lines.append(line)
+        # if line does not containe ':', it is the same character speaking
+        else:
+            # combiens lines
+            # new_lines[-1] = new_lines[-1] + ' ' + line
+            # add last speaking character to line
+            new_lines.append(last_speaking + ': ' + line)
+
+    return new_lines
+
+
 # format transcript file so we can easily create csv later
 def format_file():
-    raw_transcipt = open(raw_file_name, "r", encoding="utf8")
+    raw_transcript = open(raw_file_name, "r", encoding="utf8")
     stripped_transcript = open(stripped_file_name, "w", encoding="utf8")
     # clear contents
     stripped_transcript.truncate(0)
-    stripped_lines = []
 
-    for line in raw_transcipt:
-        # remove all characters and lines we don't need
-        stripped_line = re.sub(
-            '\{.*\}|\[.*?\]|\=.*\=|\(.*\)|\'\'\'|\[|\]|\{|\}', '', line)
-        # if line has content then write to file, otherwise it is just blank and can be ignored
-        if not stripped_line.isspace():
-            stripped_lines.append(stripped_line)
-
-    # combine stripped lines so each characters dialog is on one line
-    new_lines = []
-    for line in stripped_lines:
-        # if line contains ':', then it is a new character speaking
-        line = line.replace('\n', '')
-        line = line.strip()
-        if ":" in line:
-            new_lines.append(line)
-        # if line does not containe ':', it is the same character speaking
-        else:
-            new_lines[-1] = new_lines[-1] + ' ' + line
+    stripped_lines = clean_lines(raw_transcript)
+    new_lines = combine_lines(stripped_lines)
 
     # write to new file
     for line in new_lines:
         stripped_transcript.write(line + '\n')
 
-    raw_transcipt.close()
+    raw_transcript.close()
     stripped_transcript.close()
 
 
@@ -50,8 +70,8 @@ def create_csv():
 
     for line in stripped_transcript:
         split_line = line.split(":")
-        #print(len(split_line))
-        current_line = {fieldnames[0]: split_line[0], fieldnames[1].strip(): split_line[1].strip()}
+        current_line = {fieldnames[0]: split_line[0],
+                        fieldnames[1]: split_line[1].strip()}
         data.append(current_line)
 
     with open(csv_file_name, 'w', newline='') as csv_file:

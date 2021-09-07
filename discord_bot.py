@@ -45,7 +45,8 @@ class MyClient(discord.Client):
         max_retries = 15
         retries = 0
         while retries < max_retries:
-            response = self.query({'inputs': {'text': 'Hello!'}})
+            response = await self.query({'inputs': {'text': 'Hello!'}})
+            print(response)
             if 'error' not in response:
                 break
             retries += 1
@@ -61,7 +62,7 @@ class MyClient(discord.Client):
         print('------')
         # send a request to the model without caring about the response
         # just so that the model wakes up and starts loading
-        self.query({'inputs': {'text': 'Hello!'}})
+        print(await self.query({'inputs': {'text': 'Hello!'}}))
 
     async def on_message(self, message):
         """

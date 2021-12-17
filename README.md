@@ -7,7 +7,7 @@ Following tutorial located here: https://www.freecodecamp.org/news/discord-ai-ch
 3. `python create_dialog_model.py` or `python create_dialog_model_nv.py` if you have an Nvidia GPU with CUDA installed.
 4. `python test_bot.py`
 
-Once the dialog model is complete, create a HuggindFace repository and push the file contents there.
+Once the dialog model is complete, create a HuggingFace repository and push the file contents there.
 
 1. `cd ouput-<size>`
 2. `pip install huggindface_hub`

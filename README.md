@@ -1,6 +1,6 @@
 # LokiDiscordChatbot
 
-Following tutorial located here: https://www.freecodecamp.org/news/discord-ai-chatbot/
+Loosely following tutorial located here: https://www.freecodecamp.org/news/discord-ai-chatbot/
 
 1. Run `clean_data.py` to create the csv if it is not already there.
 2. `pip install -r requirements.txt`
